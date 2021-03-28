@@ -1,5 +1,7 @@
 # genshin-impact-lyre-song-autoplay
 usage:
+In Genshin Impact, equip and use lyre;
+then run
 ./lyresong-autoplay.py #songnum
 
 songnum can only be 0-7 now.
