@@ -1,6 +1,5 @@
 from time import sleep
-
-from pynput.keyboard import Key, Controller
+from pynput.keyboard import Controller
 from mido import MidiFile
 
 
@@ -36,60 +35,62 @@ def note2key(note, base=48):
 
 
 def play_music(filename, base=48):
-    mid = MidiFile(filename, clip=True)
+    midi = MidiFile(filename, clip=True)
     keyboard = Controller()
     print('start to play in 2 seconds:', filename)
     sleep(1)
     sleep(1)
-    for msg in mid.play():
-        # print(msg.type)
-        # continue
-        if msg.type == "note_on":
+    for msg in midi.play():
+        if msg.type == "note_on" and msg.velocity > 0:
+            # print(msg)
             note = msg.note
-            # print(note)
-            base_note, key = note2key(note, base=base)
+            base_note, key = note2key(note, base)
             if key:
                 print('on\t%d\t%d\t%s' % (note, base_note, key))
                 keyboard.press(key)
-        elif msg.type == "note_off":
-            note = msg.note
-            # print(note)
-            base_note, key = note2key(note, base=base)
-            if key:
-                print('**off\t%d\t%d\t%s' % (note, base_note, key))
                 keyboard.release(key)
-                # sleep(0.02)
-
-    # keyboard = Controller()
-    # for i in range(10):
-    #     keyboard.press('a')
-    #     keyboard.release('a')
-    #     sleep(1)
     pass
 
 
 if __name__ == '__main__':
     import argparse
-
-    parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('num', metavar='N', type=int, help='the choice of music')
-    args = parser.parse_args()
+    import sys
 
     playlist = [
-        ('Genshin_Impact_main_theme_simple.mid', 48),
-        ('dawn_winery_piano.mid', 48),
-        ('Dragonspine_Song.mid', 48),
+        ('Mondstadt_dawn_winery.mid', 48),
+        ('Chararctor_theme_Ganyu_Radiant_Dreams.mid', 48),
+        ('Chararctor_theme_Klee_Crimson_Knight.mid', 60),
+        ('Chararctor_theme_Zhongli_the_Listener.mid', 48),
         ('Dragonspine_Song_no_tune_change.mid', 48),
-        ('Qingce_Village_clip.mid', 60),
-        ('Moon_in_ones_cpu.mid', 48),
-        ('liyue_sunset.mid', 48),
-        ('Genshin_Impact_Luhua_Pool.mid', 60),
+        ('Dragonspine_Ice_Ballad.mid', 60),
+        ('Liyue_Luhua_Pool.mid', 48),
+        ('Liyue_Another_Hopeful_Tomorrow.mid', 48),
+        ('Liyue_Medley_Calm_tracks.mid', 48),
+        ('Liyue_Moon_in_ones_cup.mid', 48),
+        ('Liyue_Rays_of_Sunlight.mid', 48),
+        ('Liyue_The_Fading_Stories(Qingce_Village_Night).mid', 60),
+        ('Liyue_Qingce_Village_simple.mid', 60),
+        ('Mondstadt_Bustling_Afternoon_of_Mondstadt.mid', 48),
+        ('Mondstadt_Tender_Strength.mid', 48),
+        ('Mondstadt_A_New_Day_with_Hope.mid', 48),
+        ('Genshin_Impact_Main_Theme__.mid', 48),
+        ('Genshin_Impact_main_theme_simple.mid', 48),
     ]
-    print("choice: ", args.num)
-    if 0 <= args.num < len(playlist):
+    help_str = 'usage: --num [0-%d]\n' % (len(playlist) - 1)
+    help_str += '\n'.join([("%d: " % i) + playlist[i][0] for i in range(len(playlist))])
+
+    parser = argparse.ArgumentParser(description='play a song in genshin impact.')
+    parser.add_argument('--num', metavar='N', type=int, required=False,
+                        help='the choice of music:[0-%d]' % (len(playlist) - 1))
+    parser.add_argument('--list', action='store_true')
+    args = parser.parse_args()
+    if args.list:
+        print(help_str)
+    elif args.num is not None and 0 <= args.num < len(playlist):
+        print("choice: ", args.num)
         mid, base = playlist[args.num]
         play_music(mid, base)
     else:
-        play_music('Genshin_Impact_Liyue_Medley_Calm.mid', base=60)
+        play_music('COFFIN_DANCE_master.mid')
         pass
     pass
