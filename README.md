@@ -1,7 +1,7 @@
 # genshin-impact-lyre-song-autoplay
 ## usage:
 
-In Genshin Impact, equip and enter lyre song mode.
+In Genshin Impact, equip and enter lyre song mode. (remember to move back current focus to the game after running script)
 
 To play multiple songs interactively, use:
 
