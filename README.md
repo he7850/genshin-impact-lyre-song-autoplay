@@ -1,10 +1,16 @@
 # genshin-impact-lyre-song-autoplay
-##usage:
+## usage:
 
-In Genshin Impact, equip and use lyre, then run:
+In Genshin Impact, equip and enter lyre song mode.
 
-python ./lyresong-autoplay.py --num #songnum
+To play multiple songs interactively, use:
 
-to see all song numbers, use:
+```python ./lyresong-autoplay.py```
 
-python ./lyresong-autoplay.py --list
+To only play certain song, use:
+
+```python ./lyresong-autoplay.py --num #songnum```
+
+To see all avaiable songs, use:
+
+```python ./lyresong-autoplay.py --list```
