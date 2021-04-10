@@ -74,17 +74,28 @@ if __name__ == '__main__':
         ('Liyue_Rays_of_Sunlight.mid', 48),
         ('Liyue_Qingce_Village_simple.mid', 60),
         ('Liyue_The_Fading_Stories(Qingce_Village_Night).mid', 60),
+        ('Liyue_Battle_Rapid_as_Wildfires.mid', 48),
         ('Mondstadt_Bustling_Afternoon_of_Mondstadt.mid', 48),
         ('Mondstadt_Tender_Strength.mid', 48),
         ('Mondstadt_A_New_Day_with_Hope.mid', 48),
+        ('Mondstadt_Let_the_Wind_Tell_You.mid', 48),
         ('Genshin_Impact_Main_Theme.mid', 48),
         ('Genshin_Impact_main_theme_simple.mid', 48),
-        ('Piano_骑士王の夸り.mid', 48),
-        ('Piano_COFFIN_DANCE_master.mid', 48),
-        ('Piano_千本樱_piano.mid', 48),
-        ('Piano_梦中的婚礼_Mariage_d\'Amour.mid', 48),
+        ('Piano_骑士王的荣耀.mid', 48),
+        ('Piano_COFFIN_DANCE.mid', 48),
+        ('Piano_千本樱.mid', 48),
+        ('Piano_梦中的婚礼.mid', 48),
+        ('Piano_水边的阿蒂丽娜.mid', 48),
+        ('Piano_卡农.mid', 48),
+        ('Piano_Summer.mid', 48),
+        ('Piano_Flower_Dance_DJ_Okawari.mid', 48),
+        ('Piano_Butterfly.mid', 48),
         ('Piano_天空之城.mid', 48),
-        ('Piano_Canon_C.mid', 48)
+        ('Piano_大鱼海棠.mid', 48),
+        ('Piano_梁祝.mid', 48),
+        ('Piano_青花瓷.mid', 48),
+        ('Piano_贝加尔湖畔.mid', 48),
+        ('Piano_童话.mid', 48)
     ]
     help_str = 'usage: --num [1-%d]\n' % (len(playlist))
     help_str += '\n'.join([("%d: " % (i+1)) + playlist[i][0]
