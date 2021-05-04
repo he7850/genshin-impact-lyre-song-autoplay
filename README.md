@@ -3,7 +3,7 @@
 
 In Genshin Impact, equip lyre song and press 'z' to enter music mode. (remember to move back current focus to the game after running script)
 
-To play multiple songs interactively, just use:
+To play multiple songs interactively, just run in Admin Cmd Promt:
 
 ```python ./lyresong-autoplay.py```
 
