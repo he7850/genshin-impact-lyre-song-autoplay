@@ -92,7 +92,7 @@ if __name__ == '__main__':
                         next_song_name = "-".join(song_name_parts[:-1])
                     print(f"当前演奏：{song_name}")
                     print(f"下一曲：{next_song_name}")
-                    with open("E:\\直播姬\\song.txt","wt") as f:
+                    with open("playinfo.txt","wt") as f:
                         f.write(f"当前演奏：{song_name}")
                     sleep(4)
                     midi_player.play(mid)
