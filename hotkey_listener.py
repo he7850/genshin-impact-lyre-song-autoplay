@@ -4,26 +4,23 @@ import keyboard
 
 class HotkeyListener:
     stop_hotkey = 'f10'
-
-    def set_stop_hotkey(self, hotkey):
-        self.stop_hotkey = hotkey
+    listener_thread = None
 
     def stop_listener(self):
         keyboard.unhook_all_hotkeys()
+        print('all hotkey listening have been canceled.')
 
-    def wait_for_event(self):
+    def wait_for_stop(self):
         keyboard.wait(self.stop_hotkey)
         # remove all previously defined hotkeys
         keyboard.unhook_all_hotkeys()
         print('all hotkey listening have been canceled.')
 
-    def register_hotkey(self, hotkey, fn, args):
-        if not isinstance(hotkey, str):
-            print('invalid hotkey!')
-            return
+    def register_hotkey(self, hotkey: str, fn, args):
         keyboard.add_hotkey(hotkey, fn, args)
 
     def start_listener(self):
-        t1 = threading.Thread(name='hotkey listener',
-                              target=self.wait_for_event)
-        t1.start()
+        self.listener_thread = threading.Thread(name='stop hotkey listener',
+                                                target=self.wait_for_stop,
+                                                daemon=True)
+        self.listener_thread.start()

@@ -1,18 +1,40 @@
 from time import sleep
 from pynput.keyboard import Controller
+import keyboard
 import mido
+
+keys = [
+    ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
+    ['a', 's', 'd', 'f', 'g', 'h', 'j'],
+    ['q', 'w', 'e', 'r', 't', 'y', 'u'],
+]
+# lowest_do_note(z) = 48, medium_do_note(a) = 60, highest_do_note(z) = 72
+note_offsets = [0, 2, 4, 5, 7, 9, 11]  # do ~ xi
+key_of_note = [0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6]
+
+
+def note2key(note, base=48) -> int:
+    index0 = (note - base) // 12
+    if index0 < 0:
+        return ' '
+    if index0 > 2:
+        return ' '
+    note_offset = note % 12
+    return keys[index0][key_of_note[note_offset]]
 
 
 class MidiPlayer:
-    speed = 1.0
+
+    speed = 100
     sleep_scale = 1.0
     debug = False
+    pause = False
     base = 48
     keyboard = Controller()
 
     def set_speed(self, speed):
         self.speed = speed
-        self.sleep_scale = round(1 / self.speed, 2)
+        self.sleep_scale = round(100 / self.speed, 3)
 
     def set_debug(self, debug):
         self.debug = debug
@@ -20,48 +42,36 @@ class MidiPlayer:
     def set_base(self, base):
         self.base = base
 
-    @staticmethod
-    def note2key(note, base=48):
-        # do = 48
-        notes = [0, 2, 4, 5, 7, 9, 11]  # do ~ xi
-        cycle = 12
-        keys = [
-            ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
-            ['a', 's', 'd', 'f', 'g', 'h', 'j'],
-            ['q', 'w', 'e', 'r', 't', 'y', 'u'],
-        ]
-        index0 = (note - base) // cycle
-        if index0 < 0 or index0 > 2:
-            return None
-        note0 = note % cycle
-        index1 = 0
-        for i in range(len(notes)):
-            if notes[i] >= note0:
-                index1 = i
-                break
-        return keys[index0][index1]
+    def toggle_pause(self):
+        self.pause = not self.pause
 
     def play(self, filename):
         midi = mido.MidiFile(filename, clip=True)
+        messages = []
+        for msg in midi:
+            if msg.is_meta:
+                continue
+            # print(msg)
+            if msg.type == "note_on":
+                message = {'type': 0,'note': msg.note, 'time': msg.time,
+                       'key': note2key(msg.note),
+                       'velocity': msg.velocity}
+                messages.append(message)
+            if msg.type == "control_change" and msg.time > 0:
+                message = {'type': 1, 'time': msg.time}
+                messages.append(message)
+        # return
         print('play in 2 seconds:', filename)
         sleep(2)
 
-        # for msg in midi.play():
-        for msg in midi:
-            if self.debug:
-                print(msg)
-            sleep(msg.time * self.sleep_scale)
-            if msg.is_meta:
+        for message in messages:
+            while self.pause:
+                sleep(1)
+            sleep(message['time'] * self.sleep_scale)
+            if message['type'] == 1:
                 continue
-            if msg.type == "note_on" and msg.velocity > 0:
-                note = msg.note
-                key = self.note2key(note, base=self.base)
-                if self.debug:
-                    if key:
-                        print('on\t%d\t%s' % (note, key))
-                    else:
-                        print('error: note=', note)
-                if key:
-                    self.keyboard.press(key)
-                    self.keyboard.release(key)
+            if message['velocity'] > 0:
+                keyboard.press_and_release(message['key'])
+                # self.keyboard.press(message['key'])
+                # self.keyboard.release(message['key'])
         print('end.')

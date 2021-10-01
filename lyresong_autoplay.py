@@ -1,101 +1,108 @@
+import sys
+import random
+from time import sleep
+import glob, os
 from midi_player import MidiPlayer
 from hotkey_listener import HotkeyListener
 
-playlist = [
-    'Charactor_theme_Ganyu_Radiant_Dreams.mid',
-    'Charactor_theme_Klee_Crimson_Knight.mid',
-    'Charactor_theme_Zhongli_the_Listener.mid',
-    'Charactor_theme_Amber_A_Sweet_Smile.mid',
-    'Dragonspine_Moonlike_Smile.mid',
-    'Dragonspine_Ice_Ballad.mid',
-    'Dragonspine_Fragile_Fantasy.mid',
-    'Dragonspine_Snow_Buried_Tales.mid',
-    'Dragonspine_Spin_Of_Ice_Crystals.mid',
-    'Dragonspine_Unfinished_Frescoes.mid',
-    'Dragonspine_ad_oblivione_遗忘的流风.mid',
-    'Liyue_Luhua_Pool.mid',
-    'Liyue_Another_Hopeful_Tomorrow.mid',
-    'Liyue_Medley_Calm_tracks.mid',
-    'Liyue_Moon_in_One\'s_Cup.mid',
-    'Liyue_Rays_of_Sunlight.mid',
-    'Liyue_Slumbering_Lore.mid',
-    'Liyue_Adeptus_Solace.mid',
-    'Liyue_maidens_longing.mid',
-    'Liyue_Good_Night_Liyue.mid',
-    'Liyue_The_Fading_Stories(Qingce_Village_Night).mid',
-    'Liyue_Battle_Rapid_as_Wildfires.mid',
-    'Liyue_Battle_Gallant_Challenge.mid',
-    'Mondstadt_dawn_winery.mid',
-    'Mondstadt_dawn_winery2.mid',
-    'Mondstadt_dawn_winery_OST.mid',
-    'Mondstadt_Bustling_Afternoon_of_Mondstadt.mid',
-    'Mondstadt_Tender_Strength.mid',
-    'Mondstadt_Night.mid',
-    'Mondstadt_Let_the_Wind_Tell_You.mid',
-    'Genshin_Impact_Main_Theme.mid',
-    'Genshin_impact_Caelestinum_Finale_Termini.mid',
-    'Piano_骑士王的荣耀.mid',
-    'Piano_COFFIN_DANCE.mid',
-    'Piano_千本樱.mid',
-    'Piano_梦中的婚礼.mid',
-    'Piano_水边的阿蒂丽娜.mid',
-    'Piano_卡农.mid',
-    'Piano_Summer.mid',
-    'Piano_Flower_Dance_DJ_Okawari.mid',
-    'Piano_Butterfly.mid',
-    'Piano_天空之城.mid',
-    'Piano_大鱼海棠.mid',
-    'Piano_梁祝.mid',
-    'Piano_青花瓷.mid',
-    'Piano_贝加尔湖畔.mid',
-    'Piano_童话.mid',
-    'Piano_林俊傑_JJ_Lin_可惜沒如果.mid',
-    'Piano_她说.mid',
-    'Piano_夜空中最亮的星.mid',
-    'Piano_Game_of_Thrones.mid'
-]
-player_args = {
-    'speed': 1.0
-}
+playlist_dirs = ['tuning', 'hard', 'easy', 'classic']
+playlist = []
+player_speed = 100
+auto_play = False
 
+def switch_to_midi_dir():
+    # change dir to midi_files
+    curr_dir = os.getcwd()
+    if "midi_files" in curr_dir:
+        midi_dir = curr_dir.split("midi_files")[0] + "/midi_files"
+        os.chdir(midi_dir)
+    else:
+        os.chdir("midi_files")
+    curr_dir = os.getcwd()
+
+def update_playlist():
+    playlist.clear()
+    for dir_name in playlist_dirs:
+        for file in glob.glob(dir_name + "/*.mid"):
+            playlist.append(file)
 
 def get_help():
-    help_str = 'usage: --num [1-%d]\n' % (len(playlist))
-    song_name_list = [entry for entry in playlist]
-    help_str += '\n'.join(["%d: %s" % (index + 1, song_name_list[index])
-                           for index in range(len(song_name_list))])
+    help_str = 'usage: --num [1-%d] (0 to exit)\n' % (len(playlist))
+    for index, name in enumerate(playlist, start=1):
+        help_str += "%d: %s\n" % (index, name)
     return help_str
 
+def adjust_speed(player: MidiPlayer, value):
+    global player_speed
+    player_speed += value
+    if player_speed < 20:
+        player_speed = 20
+    player.set_speed(player_speed)
+    print('adjust speed to: %d%%' % player_speed)
 
-def adjust_speed(player: MidiPlayer, args, flag):
-    args['speed'] += 0.04 * flag
-    player.set_speed(args['speed'])
-    print('adjust speed to: %.2f' % args['speed'])
-
+def toggle_pause(player: MidiPlayer):
+    global auto_play
+    player.toggle_pause()
+    auto_play = not auto_play
 
 if __name__ == '__main__':
+    switch_to_midi_dir()
+    update_playlist()
     midi_player = MidiPlayer()
+    midi_player.set_debug(False)
     hotkey_listener = HotkeyListener()
-    hotkey_listener.register_hotkey("f7", adjust_speed, args=(midi_player, player_args, -1))
-    hotkey_listener.register_hotkey("f8", adjust_speed, args=(midi_player, player_args, 1))
+    hotkey_listener.register_hotkey("-", adjust_speed, args=(midi_player, -4))
+    hotkey_listener.register_hotkey("+", adjust_speed, args=(midi_player, 4))
+    hotkey_listener.register_hotkey("/", toggle_pause, args=(midi_player,))
     hotkey_listener.start_listener()
-    print('start listening hotkeys: use f7/f8 to adjust speed...')
+    print('start listening hotkeys: use -/+ to adjust speed...')
+
     line = ''
     while True:
         print(get_help())
-        print('input your music choice:')
+        print('input your music choice:(0 to randomly autoplay)')
         try:
             line = input()
         except KeyboardInterrupt:
+            print('exit lyresong autoplay.')
             hotkey_listener.stop_listener()
-            exit(0)
+            sys.exit(0)
 
         try:
             choice = int(line)
-            if 0 < choice <= len(playlist):
+            if choice == 0:
+                current = next = -1
+                auto_play = True
+                while auto_play:
+                    if next != -1:
+                        current = next
+                    else:
+                        current = random.randint(0,len(playlist)-1)
+                    next = random.randint(0,len(playlist)-1)
+                    mid = playlist[current]
+                    # classic\雪掩的往事.mid
+                    # classic\龙脊雪山-雪掩的往事-Dragonspine_Snow_Buried_Tales.mid
+                    song_name = mid.split("\\")[1].replace(".mid","").replace("Piano_","")
+                    song_name_parts = song_name.split("-")
+                    if len(song_name_parts) > 1:
+                        song_name = "-".join(song_name_parts[:-1])
+                    next_song_name = playlist[next].split("\\")[1].replace(".mid","")
+                    song_name_parts = next_song_name.split("-")
+                    if len(song_name_parts) > 1:
+                        next_song_name = "-".join(song_name_parts[:-1])
+                    print(f"当前演奏：{song_name}")
+                    print(f"下一曲：{next_song_name}")
+                    with open("E:\\直播姬\\song.txt","wt") as f:
+                        f.write(f"当前演奏：{song_name}")
+                    sleep(4)
+                    midi_player.play(mid)
+            elif 0 < choice <= len(playlist):
                 mid = playlist[choice - 1]
-                midi_player.play("midi_files/" + mid)
+                midi_player.play(mid)
             else:
                 continue
+        except FileNotFoundError:
+            print("The midi file has been deleted, now refresh dir...")
+            update_playlist()
         except (NameError, ValueError, KeyboardInterrupt):
             continue
