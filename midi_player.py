@@ -32,6 +32,8 @@ class MidiPlayer:
     base = 48
     keyboard = Controller()
 
+    notes = []
+
     def set_speed(self, speed):
         self.speed = speed
         self.sleep_scale = round(100 / self.speed, 3)
@@ -53,9 +55,16 @@ class MidiPlayer:
                 continue
             # print(msg)
             if msg.type == "note_on":
-                message = {'type': 0,'note': msg.note, 'time': msg.time,
-                       'key': note2key(msg.note),
-                       'velocity': msg.velocity}
+                key = note2key(msg.note)
+                if key == ' ' or msg.velocity <= 0:
+                    message = {'type': 1, 'time': msg.time}
+                else:
+                    message = {
+                        'type': 0,
+                        # 'note': msg.note,
+                        'time': msg.time,
+                        'key': key,
+                    }
                 messages.append(message)
             if msg.type == "control_change" and msg.time > 0:
                 message = {'type': 1, 'time': msg.time}
@@ -70,8 +79,7 @@ class MidiPlayer:
             sleep(message['time'] * self.sleep_scale)
             if message['type'] == 1:
                 continue
-            if message['velocity'] > 0:
-                keyboard.press_and_release(message['key'])
-                # self.keyboard.press(message['key'])
-                # self.keyboard.release(message['key'])
+            keyboard.press_and_release(message['key'])
+            # self.keyboard.press(message['key'])
+            # self.keyboard.release(message['key'])
         print('end.')
