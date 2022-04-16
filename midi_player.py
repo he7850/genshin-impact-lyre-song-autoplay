@@ -20,8 +20,6 @@ def note2key(note, base=48) -> int:
     if index0 < 0:
         return ' '
     if index0 > 2:
-        index0 -= 1
-    if index0 > 2:
         return ' '
     note_offset = note % 12
     return keys[index0][key_of_note[note_offset]]
