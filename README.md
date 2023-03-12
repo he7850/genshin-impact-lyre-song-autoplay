@@ -17,7 +17,7 @@ tool for autoplaying genshin lyre. run by python.
 
 3. 安装依赖：安装python3，并运行: pip install requirements.txt
 
-   install dependencies: install python3, and run: pip install requirements.txt
+   install dependencies: install python3, and run: pip install -r requirements.txt
 
 #### 使用说明/usage
 
