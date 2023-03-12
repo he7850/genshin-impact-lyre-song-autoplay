@@ -59,6 +59,7 @@ if __name__ == '__main__':
 
     line = ''
     while True:
+        update_playlist()
         print(get_help())
         print('input your music choice:(0 to randomly autoplay)')
         try:
