@@ -129,7 +129,9 @@ dmypy.json
 .pyre/
 
 playinfo.txt
-midi_files/tuning/
+temp.mid
 .vscode/
 .idea/
 .vs/
+msg.txt
+notes.txt

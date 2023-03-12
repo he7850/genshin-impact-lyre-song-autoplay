@@ -5,7 +5,7 @@ import glob, os
 from midi_player import MidiPlayer
 from hotkey_listener import HotkeyListener
 
-playlist_dirs = ['tuning', 'hard', 'easy', 'classic']
+playlist_dirs = ['other', 'genshin']
 playlist = []
 player_speed = 100
 auto_play = False
