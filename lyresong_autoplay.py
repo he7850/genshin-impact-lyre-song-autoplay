@@ -9,6 +9,7 @@ playlist_dirs = ['other', 'genshin']
 playlist = []
 player_speed = 100
 auto_play = False
+random_play = False
 
 def switch_to_midi_dir():
     # change dir to midi_files
@@ -45,6 +46,12 @@ def toggle_pause(player: MidiPlayer):
     player.toggle_pause()
     auto_play = not auto_play
 
+def toggle_random(player: MidiPlayer):
+    global random_play
+    player.toggle_random()
+    random_play = not random_play
+    print('random mode:', random_play)
+
 if __name__ == '__main__':
     switch_to_midi_dir()
     update_playlist()
@@ -54,6 +61,7 @@ if __name__ == '__main__':
     hotkey_listener.register_hotkey("-", adjust_speed, args=(midi_player, -4))
     hotkey_listener.register_hotkey("+", adjust_speed, args=(midi_player, 4))
     hotkey_listener.register_hotkey("/", toggle_pause, args=(midi_player,))
+    hotkey_listener.register_hotkey("*", toggle_random, args=(midi_player,))
     hotkey_listener.start_listener()
     print('start listening hotkeys: use -/+ to adjust speed...')
 

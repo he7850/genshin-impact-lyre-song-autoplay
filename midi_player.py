@@ -2,6 +2,9 @@ from time import sleep
 from pynput.keyboard import Controller
 import keyboard
 import mido
+import random
+
+random_change = [1 + random.randint(-4, 16) / 100 for i in range(1000)]
 
 keys = (
     ('z', 'x', 'c', 'v', 'b', 'n', 'm'),
@@ -26,6 +29,8 @@ class MidiPlayer:
     sleep_scale = 1.0
     debug = False
     pause = False
+    random_mode = False
+    random_index = 0
     base = 48
     keyboard = Controller()
 
@@ -43,6 +48,9 @@ class MidiPlayer:
 
     def toggle_pause(self):
         self.pause = not self.pause
+
+    def toggle_random(self):
+        self.random_mode = not self.random_mode
 
     def play(self, filename):
         midi = mido.MidiFile(filename, clip=True)
@@ -116,7 +124,12 @@ class MidiPlayer:
             while self.pause:
                 sleep(1)
             if message['time'] > 0:
-                sleep(message['time'] * self.sleep_scale)
+                if self.random_mode:
+                    # print('random change:', random_change[self.random_index // 3 % 1000])
+                    sleep(message['time'] * self.sleep_scale * random_change[self.random_index // 3 % 1000])
+                    self.random_index = self.random_index + 1
+                else:
+                    sleep(message['time'] * self.sleep_scale)
             if message['type'] == 1:
                 continue
             # print(message['key'])
